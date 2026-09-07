@@ -22,3 +22,19 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+
+# Jafra references (read-only local clones; never commit)
+references/
+
+# Benchmark / deploy artifacts
+artifacts/
+*.jfr
+
+# Rendered Kubernetes manifests (envsubst output)
+.k8s-rendered/
+
+# Local overrides
+config/local.env
+.env
+.DS_Store
