@@ -1,0 +1,21 @@
+# Ignore local reference clones and build noise when building from repo root.
+references/
+References/
+artifacts/
+.k8s-rendered/
+.git/
+**/.git/
+**/target/
+**/.bsp/
+**/.metals/
+**/.bloop/
+**/project/project/
+**/.idea/
+**/*.class
+**/*.log
+.DS_Store
+README.md
+LICENSE
+scripts/
+k8s/
+config/

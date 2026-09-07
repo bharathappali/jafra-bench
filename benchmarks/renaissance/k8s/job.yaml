@@ -1,0 +1,73 @@
+# Templated Job for Renaissance. Placeholders are substituted by deploy.sh via envsubst.
+# Required Jafra opt-in: labels enabled/mode + annotation jafra.io/containers.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${NAMESPACE}
+  labels:
+    app.kubernetes.io/part-of: jafra-bench
+    app.kubernetes.io/managed-by: jafra-bench-deploy
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ${JOB_NAME}
+  namespace: ${NAMESPACE}
+  labels:
+    app.kubernetes.io/name: renaissance
+    app.kubernetes.io/part-of: jafra-bench
+    app.kubernetes.io/component: benchmark
+    app.kubernetes.io/managed-by: jafra-bench-deploy
+    jafra-bench.benchmark: renaissance
+spec:
+  ttlSecondsAfterFinished: 86400
+  backoffLimit: 0
+  activeDeadlineSeconds: ${ACTIVE_DEADLINE_SECONDS}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: renaissance
+        app.kubernetes.io/part-of: jafra-bench
+        app.kubernetes.io/component: benchmark
+        jafra-bench.benchmark: renaissance
+        jafra.io/enabled: "true"
+        jafra.io/mode: "continuous"
+      annotations:
+        jafra.io/containers: "${CONTAINER_NAME}"
+        jafra.io/loop: "${JAFRA_LOOP}"
+        jafra.io/jfrsync: "${JAFRA_JFRSYNC}"
+        jafra-bench.image: "${IMAGE}"
+    spec:
+      restartPolicy: Never
+      # Do NOT set pod-level runAsNonRoot: Jafra's injected init
+      # (async-profiler) runs as root and would fail with
+      # CreateContainerConfigError. Keep non-root on the app container only.
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: ${CONTAINER_NAME}
+          image: ${IMAGE}
+          imagePullPolicy: ${IMAGE_PULL_POLICY}
+          env:
+            - name: BENCHMARKS
+              value: "${BENCHMARKS}"
+            - name: RENAISSANCE_ARGS
+              value: "${RENAISSANCE_ARGS}"
+            - name: JAVA_OPTS
+              value: "${JAVA_OPTS}"
+          resources:
+            requests:
+              cpu: "${CPU_REQUEST}"
+              memory: "${MEMORY_REQUEST}"
+            limits:
+              cpu: "${CPU_LIMIT}"
+              memory: "${MEMORY_LIMIT}"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
