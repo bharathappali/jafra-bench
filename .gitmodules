@@ -2,3 +2,7 @@
 	path = renaissance
 	url = https://github.com/bharathappali/renaissance.git
 	branch = dev
+[submodule "dacapobench"]
+	path = dacapobench
+	url = https://github.com/bharathappali/dacapobench.git
+	branch = dev
